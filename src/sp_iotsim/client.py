@@ -31,10 +31,36 @@ async def main(port: int, addr: str, max_packets: int, log_file: Path):
             print(zlib.decompress(qb).decode("utf8"))
         else:
             print(qb)
-
+        f = open('output.txt','w')
         for i in range(max_packets):
             data = await websocket.recv()
             if i % 5 == 0:
                 pass
                 # print(f"{i} total messages received")
+            f.write(data)
+            f.write("\n")
             print(data)
+        f.close()
+
+
+def cli():
+    p = argparse.ArgumentParser(description="WebSocket client")
+    p.add_argument("-l", "--log", help="file to log JSON data")
+    p.add_argument("-host", help="Host address", default="localhost")
+    p.add_argument("-port", help="network port", type=int, default=8765)
+    p.add_argument(
+        "-max_packets",
+        help="shut down program after total packages received",
+        type=int,
+        default=100000,
+    )
+    P = p.parse_args()
+
+    try:
+        asyncio.run(main(P.port, P.host, P.max_packets, P.log))
+    except KeyboardInterrupt:
+        print(P.log)
+
+
+if __name__ == "__main__":
+    cli()
