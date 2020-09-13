@@ -1,14 +1,13 @@
 import websockets
 import zlib
+
 from pathlib import Path
 
 
-async def main(port: int, addr: str, max_packets: int, log_file: Path):
+async def main(port: int, addr: str, max_packets: int, log_file: Path = None):
     """
-
     Parameters
     ----------
-
     port: int
         the network port to use (arbitrary, must match server)
     addr: str
@@ -19,28 +18,26 @@ async def main(port: int, addr: str, max_packets: int, log_file: Path):
     log_file: pathlib.Path
         where to store the data received (student must add code for this)
     """
-
     if log_file:
         log_file = Path(log_file).expanduser()
-
     uri = f"ws://{addr}:{port}"
-
     async with websockets.connect(uri) as websocket:
         qb = await websocket.recv()
         if isinstance(qb, bytes):
             print(zlib.decompress(qb).decode("utf8"))
         else:
             print(qb)
-            f=open('data.txt','w')
+
+        f = open('data.txt','w')
         for i in range(max_packets):
             data = await websocket.recv()
             if i % 5 == 0:
                 pass
-                    # print(f"{i} total messages received")
-                f.write(data)  #
-                f.write("\n")
-                print(data)
-                f.close()
+                # print(f"{i} total messages received")
+            f.write(data + "\n")
+            print(data)
+            f.flush()
+        f.close()
 
 
 def cli():
@@ -55,12 +52,9 @@ def cli():
         default=100000,
     )
     P = p.parse_args()
-
     try:
         asyncio.run(main(P.port, P.host, P.max_packets, P.log))
     except KeyboardInterrupt:
         print(P.log)
-
-
 if __name__ == "__main__":
     cli()
