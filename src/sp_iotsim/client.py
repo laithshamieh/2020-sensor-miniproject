@@ -31,16 +31,16 @@ async def main(port: int, addr: str, max_packets: int, log_file: Path):
             print(zlib.decompress(qb).decode("utf8"))
         else:
             print(qb)
-        f = open('output.txt','w')
+            f=open('data.txt','w')
         for i in range(max_packets):
             data = await websocket.recv()
             if i % 5 == 0:
                 pass
-                # print(f"{i} total messages received")
-            f.write(data)
-            f.write("\n")
-            print(data)
-        f.close()
+                    # print(f"{i} total messages received")
+                f.write(data)  #
+                f.write("\n")
+                print(data)
+                f.close()
 
 
 def cli():
