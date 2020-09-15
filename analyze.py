@@ -17,7 +17,7 @@ import typing as T
 import matplotlib.pyplot as plt
 import numpy as np
 
-
+filer = open('data.txt')
 def load_data(file: Path) -> T.Dict[str, pandas.DataFrame]:
 
     temperature = {}
@@ -34,6 +34,12 @@ def load_data(file: Path) -> T.Dict[str, pandas.DataFrame]:
             occupancy[time] = {room: r[room]["occupancy"][0]}
             co2[time] = {room: r[room]["co2"][0]}
 
+            temp = []
+        #temp.append(list(v.values())[0])
+        #DFtemp = pandas.DataFrame(temp)
+        #print("Temp Median:", Median[0])
+        #print("Temp Variance:", Var[0])
+        occu = []
     data = {
         "temperature": pandas.DataFrame.from_dict(temperature, "index").sort_index(),
         "occupancy": pandas.DataFrame.from_dict(occupancy, "index").sort_index(),
@@ -44,20 +50,27 @@ def load_data(file: Path) -> T.Dict[str, pandas.DataFrame]:
 
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(description="load and analyse IoT JSON data")
-    p.add_argument("file", help="path to JSON data file")
-    P = p.parse_args()
-
-    file = Path(P.file).expanduser()
-
-    data = load_data(file)
-
+    data = load_data('data.txt')
     for k in data:
-        # data[k].plot()
+        if k == 'temperature':
+            print('')
+            print('For lab1:')
+            print('')
+            print('Temperature Median: ' + str(data[k]['lab1'].median()))
+            print('Temperature Variance: ' + str(data[k]['lab1'].var()))
+            print('')
+        if k == 'occupancy':
+            print('Occupancy Median: ' + str(data[k]['lab1'].median()))
+            print('Occupancy Variance: ' + str(data[k]['lab1'].var()))
+            print('')
+
+            # data[k].plot()
         time = data[k].index
         data[k].hist()
         plt.figure()
         plt.hist(np.diff(time.values).astype(np.int64) // 1000000000)
         plt.xlabel("Time (seconds)")
+
+
 
     plt.show()
