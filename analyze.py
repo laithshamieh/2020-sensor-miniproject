@@ -24,7 +24,7 @@ def load_data(file: Path) -> T.Dict[str, pandas.DataFrame]:
     occupancy = {}
     co2 = {}
 
-    with open(file, "r") as f:
+    with open('data.txt', "r") as f:
         for line in f:
             r = json.loads(line)
             room = list(r.keys())[0]
@@ -51,26 +51,49 @@ def load_data(file: Path) -> T.Dict[str, pandas.DataFrame]:
 
 if __name__ == "__main__":
     data = load_data('data.txt')
+###
     for k in data:
         if k == 'temperature':
             print('')
-            print('For lab1:')
+            print('For office:')
             print('')
-            print('Temperature Median: ' + str(data[k]['lab1'].median()))
-            print('Temperature Variance: ' + str(data[k]['lab1'].var()))
+            print('Temperature Median: ' + str(data[k]['office'].median()))
+            print('Temperature Variance: ' + str(data[k]['office'].var()))
             print('')
         if k == 'occupancy':
-            print('Occupancy Median: ' + str(data[k]['lab1'].median()))
-            print('Occupancy Variance: ' + str(data[k]['lab1'].var()))
+            print('Occupancy Median: ' + str(data[k]['office'].median()))
+            print('Occupancy Variance: ' + str(data[k]['office'].var()))
             print('')
-
-            # data[k].plot()
+###
+              # data[k].plot()
         time = data[k].index
         data[k].hist()
         plt.figure()
         plt.hist(np.diff(time.values).astype(np.int64) // 1000000000)
         plt.xlabel("Time (seconds)")
-
-
+###
+        plt.figure()
+        data[k]['office'].plot.density()
+        plt.title('Probability Density Functions for ' + k)
+        if k == 'temperature':
+            plt.xlabel('Temperature/°C')
+        elif k == 'occupancy':
+            plt.xlabel('No. of People')
+        elif k == 'co2':
+            plt.xlabel('co2 level')
+###
+    time = data['temperature'].index
+    time_series = pandas.Series([t.total_seconds() for t in (time[1:] - time[:-1])])
+    print('')
+    print('Time Interval across all Rooms:')
+    print('')
+    print('Time Interval Mean: ' + str(time_series.mean()))
+    print('Time Interval Variance: ' + str(time_series.var()))
+    print('')
+    plt.figure()
+    time_series.plot.density()
+    plt.title('Probability Density Function For Time Interval')
+    plt.xlabel('Time (seconds)')
+###
 
     plt.show()
